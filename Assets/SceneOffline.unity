@@ -167,7 +167,7 @@ MonoBehaviour:
   dontDestroyOnLoad: 1
   runInBackground: 1
   headlessStartMode: 1
-  editorAutoStart: 0
+  editorAutoStart: 1
   sendRate: 60
   autoStartServerBuild: 0
   autoConnectClientBuild: 0

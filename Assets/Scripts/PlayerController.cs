@@ -4,65 +4,47 @@ using System.Collections;
 
 public class PlayerController : NetworkBehaviour
 {
-    [SyncVar]
-    public Ship ship;
-    [SyncVar]
-    private Gun currentGun;
-    [SyncVar]
-    private int currentAmmo;
-    [SyncVar]
-    private float nextFireTime;
+    public float moveSpeed = 5f;
+    private Rigidbody2D rb;
 
     void Start()
     {
-        if (!isLocalPlayer) return;
-
-        // Initialize the player's ship and its guns
-        if (!isServer) return;
-        EquipGun(ship.guns[0]); // Example: equip the first gun
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
         if (!isLocalPlayer) return;
+        HandleInput();
+    }
 
-        // Shooting logic
-        if (Input.GetButton("Fire1") && Time.time > nextFireTime && currentAmmo > 0)
-        {
-            CmdShoot();
-        }
+    [Client]
+    void HandleInput()
+    {
+        // Capture input for movement and rotation
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        float moveVertical = Input.GetAxis("Vertical");
+        Vector2 movement = new Vector2(moveHorizontal, moveVertical);
 
-        // Reload logic
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            CmdReload();
-        }
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 direction = (Vector2)(mousePosition - transform.position);
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        // Send input to server
+        CmdMoveAndRotate(movement, angle);
     }
 
     [Command]
-    void CmdShoot()
+    void CmdMoveAndRotate(Vector2 movement, float angle)
     {
-        currentGun.shootingBehavior.Shoot(transform, currentGun.bulletType, ref currentAmmo, currentGun.fireRate);
-        nextFireTime = Time.time + 1f / currentGun.fireRate;
-    }
-
-        [Command]
-    void CmdReload()
-    {
-        StartCoroutine(Reload());
+        // Apply movement on the server
+        MoveAndRotate(movement, angle);
     }
 
     [Server]
-    void EquipGun(Gun gun)
+    void MoveAndRotate(Vector2 movement, float angle)
     {
-        currentGun = gun;
-        currentAmmo = currentGun.magazineSize;
-    }
-
-    IEnumerator Reload()
-    {
-        // Reload logic
-        yield return new WaitForSeconds(currentGun.reloadTime);
-        currentAmmo = currentGun.magazineSize;
+        rb.velocity = movement.normalized * moveSpeed;
+        rb.rotation = angle - 90f; // Adjust based on the initial orientation of your sprite
     }
 }
