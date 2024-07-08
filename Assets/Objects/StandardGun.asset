@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12728eae4a170fd4e8ae1a9f37e657b6, type: 3}
+  m_Name: StandardGun
+  m_EditorClassIdentifier: 
+  gunName: Standard
+  shootingDistance: 30
+  fireRate: 1
+  magazineSize: 30
+  reloadTime: 2
+  maxAmmo: 120
+  shootingBehavior: {fileID: 11400000, guid: a420ced7c8bfb784b81e71f9fee8b459, type: 2}
+  bulletType: {fileID: 11400000, guid: 866282c0420c5a34a87c0cd00dd7c18d, type: 2}
