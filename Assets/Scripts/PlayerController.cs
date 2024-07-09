@@ -1,9 +1,14 @@
 using UnityEngine;
 using Mirror;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class PlayerController : NetworkBehaviour
 {
+    [SyncVar]
+    public Vector2 inputMovement;
+    [SyncVar]
+    public float inputAngle;
     public float moveSpeed = 5f;
     private Rigidbody2D rb;
     private Vector2 previousMovement;
@@ -35,7 +40,6 @@ public class PlayerController : NetworkBehaviour
         // Check if movement input has changed
         if (movement != previousMovement)
         {
-            Debug.Log("handle input move");
             // Send movement input to server
             CmdMove(movement);
 
@@ -57,27 +61,32 @@ public class PlayerController : NetworkBehaviour
     [Command]
     void CmdMove(Vector2 movement)
     {
-        Debug.Log("movment");
-        // Apply movement on the server
-        Move(movement);
+        inputMovement = movement;
     }
 
     [Command]
     void CmdRotate(float angle)
     {
-        // Apply rotation on the server
-        Rotate(angle);
+        inputAngle = angle;
+    }
+
+    void FixedUpdate()
+    {
+        if (isServer) {
+            Move();
+            Rotate();
+        }
     }
 
     [Server]
-    void Move(Vector2 movement)
+    void Move()
     {
-        rb.velocity = movement.normalized * moveSpeed;
+        rb.velocity = inputMovement.normalized * moveSpeed;
     }
 
     [Server]
-    void Rotate(float angle)
+    void Rotate()
     {
-        rb.rotation = angle - 90f; // Adjust based on the initial orientation of your sprite
+        rb.rotation = inputAngle - 90f; // Adjust based on the initial orientation of your sprite
     }
 }
